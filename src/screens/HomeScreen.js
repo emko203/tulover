@@ -30,39 +30,24 @@ const HomeScreen = () => {
     setIsBalanceVisible(!isBalanceVisible);
   };
 
-  // Function to render a transaction in the format similar to the screenshot
-  const renderTransaction = ({ item: transaction }) => {
-    return (
-      <View style={styles.transactionItem}>
-        <View style={styles.transactionDetails}>
-          <Text style={styles.transactionName}>{transaction.description}</Text>
-          <Text style={styles.transactionMeta}>
-            {transaction.type} • {transaction.date}
-          </Text>
-        </View>
-        <Text style={styles.transactionAmount}>{transaction.amount}</Text>
-      </View>
-    );
-  };
-
-  return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-     <View style={styles.header}>
+  const renderHeader = () => (
+    <>
+      <View style={styles.header}>
         <View style={styles.headerTextContainer}>
           <Text style={styles.welcomeText}>Welcome back,</Text>
           <Text style={styles.userName}>Emko</Text>
         </View>
         <Ionicons name="notifications-outline" size={24} color="black" />
       </View>
-
-      <FlatList horizontal
-        showsHorizontalScrollIndicator={false} 
+      <FlatList
+        horizontal
+        showsHorizontalScrollIndicator={false}
         data={cards}
-        renderItem={({item}) => <Card item={item}/>}
+        renderItem={({ item }) => <Card item={item} />}
+        keyExtractor={(item, index) => index.toString()}
       />
-
       <View style={styles.totalBalanceContainer}>
-        <View>
+      <View>
           <Text style={styles.totalBalanceTitle}>Total Balance</Text>
           <Text style={styles.totalBalanceAmount}>
             {isBalanceVisible ? `${totalBalance.toFixed(2)} €` : '****** €'}
@@ -73,16 +58,35 @@ const HomeScreen = () => {
         </TouchableOpacity>
       </View>
 
-      <View style={styles.transactionBox}>
-        <Text style={styles.transactionBoxTitle}>Latest Transactions</Text>
-        <FlatList
-          data={transactions.slice(-3)}
-          renderItem={renderTransaction}
-          keyExtractor={(item) => item.id.toString()}
-          style={styles.transactionsList}/>
-      </View>
-    </ScrollView>
+      <Text style={styles.transactionBoxTitle}>Latest Transactions</Text>
+    </>
   );
+
+const renderTransaction = ({ item: transaction }) => {
+  return (
+    <View style={styles.transactionItem}>
+      <View style={styles.transactionDetails}>
+        <Text style={styles.transactionName}>{transaction.description}</Text>
+        <Text style={styles.transactionMeta}>
+          {transaction.type} • {transaction.date}
+        </Text>
+      </View>
+      <Text style={styles.transactionAmount}>{transaction.amount}</Text>
+    </View>
+  );
+};
+
+return (
+  <FlatList
+    ListHeaderComponent={renderHeader}
+    data={lastThreeTransactions}
+    renderItem={renderTransaction}
+    keyExtractor={(item) => item.id.toString()}
+    style={styles.container}
+    showsVerticalScrollIndicator={false}
+    contentContainerStyle={styles.contentContainer}
+  />
+);
 };
 
 const styles = StyleSheet.create({
@@ -194,7 +198,7 @@ const styles = StyleSheet.create({
   },
 
   transactionBox: {
-    backgroundColor: 'white', // Background color for the transaction box
+    backgroundColor: 'white',
     borderRadius: 8,
     padding: 16,
     marginVertical: 8,
@@ -215,9 +219,8 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#f2f2f2',
-  },
-  transactionIcon: {
-    marginRight: 12,
+    marginLeft: 16,
+    marginRight: 16
   },
   transactionDetails: {
     flex: 1,
@@ -238,6 +241,12 @@ const styles = StyleSheet.create({
   },
   transactionsList: {
     maxHeight: 192,
+  },
+  transactionBoxTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginHorizontal: 20,
+    marginTop: 20,
   },
 },
 );
